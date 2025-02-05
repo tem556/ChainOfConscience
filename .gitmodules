@@ -1,0 +1,3 @@
+[submodule "src/open-r1"]
+	path = src/open-r1
+	url = https://github.com/huggingface/open-r1.git
