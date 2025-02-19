@@ -1,5 +1,6 @@
 """Lightweight insider benchmark for quick iteration"""
 
+import argparse
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import json
 import vllm
@@ -34,43 +35,59 @@ INSTRUCT_PROMPT = (
     "Respond only with the example, and nothing else.\n"
 )
 
-model_name_or_path = 'data/QWEN-CoC-GRPO/checkpoint-500'
-device = "cuda:0"
-
-model = LLM(
-        model=model_name_or_path,
-        dtype='bfloat16',
-)
-
-tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-
-# Read input data and get specific prompt
-jailbreaks = read_from_jsonl("data/benchmarks/cypher_dataset.jsonl")
-
-inputs = []
-
-for jailbreak in jailbreaks:
     
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": INSTRUCT_PROMPT + jailbreak},
-    ]
-
-    prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, continue_final_message=False)
-    inputs.append(prompt)
-
-sampling_params = SamplingParams(
-        temperature=0.7,
-        max_tokens=2048,
-        top_p=0.9,
+def main():
+    # Load args
+    parser = argparse.ArgumentParser(description="Quick iteration against StructTransform attacks")
+    parser.add_argument("-m", "--model", type=str, 
+                        help="Path or name of model to test against", default="saved_models/QWEN-CoC-GRPO-v1/checkpoint-500")
+    parser.add_argument("-b", "--benchmark", type=str, 
+                        help="Path to benchmarks jsonl file", default="data/benchmarks/cypher_dataset.jsonl")
+    parser.add_argument("--bfloat16", action="store_true", help="Enable bfloat16 precision (default: True)")
+    parser.add_argument("--no-bfloat16", action="store_false", dest="bfloat16", help="Disable bfloat16 precision")
+    args = parser.parse_args()
+    
+    # Load the model with specific settings 
+    model_name_or_path = args.model
+    model = LLM(
+            model=model_name_or_path,
+            dtype='bfloat16' if args.bfloat16 else 'float16',
     )
 
-outputs = model.generate(inputs, sampling_params)
+    tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 
-for prompt, output in zip(jailbreaks, outputs):
-    print("=" * 35)
-    print("Prompt")
-    print(prompt)
-    print("=" * 35)
-    print("Response:")
-    print(output.outputs[0].text)
+    # Read input data and get specific prompt
+    jailbreaks = read_from_jsonl(args.benchmark)
+    inputs = []
+    for jailbreak in jailbreaks:
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": INSTRUCT_PROMPT + jailbreak},
+        ]
+
+        prompt = tokenizer.apply_chat_template(
+            messages, 
+            tokenize=False, 
+            add_generation_prompt=True, 
+            continue_final_message=False
+        )
+        inputs.append(prompt)
+
+    sampling_params = SamplingParams(
+            temperature=0.7,
+            max_tokens=2048,
+            top_p=0.9,
+    )
+
+    # Generate outputs from the model and print
+    outputs = model.generate(inputs, sampling_params)
+    for prompt, output in zip(jailbreaks, outputs):
+        print("=" * 35)
+        print("Prompt")
+        print(prompt)
+        print("=" * 35)
+        print("Response:")
+        print(output.outputs[0].text)
+
+if __name__ == "__main__":
+    main()
