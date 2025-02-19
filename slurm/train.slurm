@@ -25,7 +25,7 @@ export PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True"
 
 # Run the training script with Accelerate
 accelerate launch \
-    --config_file src/open-r1/recipes/accelerate_configs/zero2.yaml \
+    --config_file recipes/accelerate_configs/zero2.yaml \
     --num_processes=3 \
-    src/open-r1/src/open_r1/grpo.py \
-    --config src/open-r1/recipes/qwen/Qwen2.5-3B-Instruct/grpo/confg_full.yaml
+     src/safety_grpo.py \
+    --config recipes/qwen/Qwen2.5-3B-Instruct/grpo/confg_full.yaml
