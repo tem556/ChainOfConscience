@@ -54,6 +54,7 @@ def extract_answer(text: str) -> str:
 
     
 def main():
+    print(registered_jailbreaks.keys())
     # Load args
     parser = argparse.ArgumentParser(description="Quick iteration against StructTransform attacks")
     parser.add_argument("-m", "--model", type=str, 
@@ -74,12 +75,18 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 
     # Read input data and get specific prompt
-    jailbreak_tactics = ['none', 'disemvowel',] 
-                        #  'pap_evidence_based_persuasion', 'gcg_transfer_universal_attacks', 'dev_mode_v2', 'refusal_suppression', 'distractors_negated', 'evil_confidant', 'aim']
+    jailbreak_tactics = ['none', 'disemvowel',
+                         'gcg_transfer_universal_attacks', 
+                         'few_shot_json', 'dev_mode_with_rant', 'dev_mode_v2', 
+                         'wikipedia_with_title', 'distractors',
+                         'style_injection_json', 'style_injection_short', 'prefix_injection',
+                         'refusal_suppression', 'evil_confidant', 'aim']
     forbidden_prompt_dataset = load_strongreject_small()
+    prompt_dataset_len = len(forbidden_prompt_dataset)
     jailbreak_prompts_dict = apply_jailbreaks_to_dataset(forbidden_prompt_dataset, jailbreak_tactics)
     jailbreak_prompts = list(map(lambda x: x[0]['content'] ,jailbreak_prompts_dict['jailbroken_prompt']))
   
+    # Convert to jailbreak chats suitable for QWEN model
     jailbreak_chats = []
     for jailbreak_prompt in jailbreak_prompts:
         messages = [
@@ -104,7 +111,11 @@ def main():
     # # Generate outputs from the model and print
     outputs = model.generate(jailbreak_chats, sampling_params)
     
-    # Go through outputs and make a list 
+    del model
+    gc.collect()
+    torch.cuda.empty_cache()
+        
+    # Print the jailbreak results and make a list of text response
     response_list = []
     for jailbreak_prompt, output in zip(jailbreak_prompts, outputs):
         print("=" * 35)
@@ -112,10 +123,22 @@ def main():
         print(output.outputs[0].text)
         response_list.append(output.outputs[0].text)
         
-    response_answers = list(map(extract_answer, response_list))
-    evaluation_batch = {"forbidden_prompt": forbidden_prompt_dataset['forbidden_prompt'], "response": response_answers}
-    eval_result = strongreject_finetuned(evaluation_batch, max_response_length=1024)
-    print(eval_result)
+    res_dict = {}
+    forbidden_prompts = forbidden_prompt_dataset['forbidden_prompt']
+    for i, tactic in enumerate(jailbreak_tactics):
+        # Evaluate only the responses for current jailbreak tactics
+        curr_response_list = response_list[i*prompt_dataset_len: (i+1)*prompt_dataset_len]
+        response_answers = list(map(extract_answer, curr_response_list))
+        evaluation_batch = {"forbidden_prompt": forbidden_prompts, "response": response_answers}
+        eval_result = strongreject_finetuned(evaluation_batch, max_response_length=512)
+        
+        # Get mean score
+        score_sum = sum(eval_result['score'])
+        score_mean = score_sum / len(forbidden_prompt_dataset)
+        res_dict[tactic] = score_mean
+        print(res_dict)
+        
+    print(res_dict)
 
 if __name__ == "__main__":
     main()
