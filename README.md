@@ -2,6 +2,7 @@
 
 An adaptive safety system that intelligently allocates test-time compute for enhanced LLM alignment through dynamic safety reasoning.
 
+> **Note**: This project builds upon the [open-r1](https://github.com/OpenR1/open-r1) project. The GRPO implementation and training recipes are derived from open-r1 and modified to suit our safety-focused requirements.
 
 ## Overview
 
@@ -58,8 +59,9 @@ git lfs install
 ```
 
 ## Usage
+
 ### Training
-The project uses GRPO for training the safety framework. We support both DDP and DeepSpeed (ZeRO-2/ZeRO-3) training methods.
+The project uses GRPO (adapted from open-r1) for training the safety framework. We support both DDP and DeepSpeed (ZeRO-2/ZeRO-3) training methods.
 
 ```bash
 # Basic training command (customize based on your environment)
@@ -102,4 +104,14 @@ Model configurations (in config_full.yaml): Defines model architecture, training
 ├─ requirements.txt
 └─ README.md
 ```
+
+## Acknowledgments
+
+This project significantly builds upon the work of the [open-r1](https://github.com/OpenR1/open-r1) project. We are grateful to the open-r1 team for their excellent foundation, particularly:
+
+- GRPO (Group Relative Policy Optimization) implementation
+- Training recipes and configurations
+- Infrastructure setup scripts
+
+While I have modified these components to suit our safety-focused requirements, the core architecture draws from their work.
 
