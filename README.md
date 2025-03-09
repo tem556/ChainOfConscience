@@ -2,18 +2,24 @@
 
 An adaptive safety system that intelligently allocates test-time compute for enhanced LLM alignment through dynamic safety reasoning.
 
----
 
 ## Overview
 
-This project implements a **safety framework** that:
-- Decouples safety reasoning from instruction following  
-- Dynamically allocates additional compute for potentially harmful prompts  
-- Uses **GRPO (Guided Reward Policy Optimization)** for training  
-- Minimizes computational overhead for safe interactions  
-- Enables scalable deployment of safety mechanisms  
+This project introduces a *dynamic safety framework* for Large Language Models (LLMs) that:
 
----
+- **Decouples Safety Reasoning from Instruction Following**: Separates the processes of understanding user instructions and evaluating their safety implications to enhance response reliability.​
+
+- **Dynamically Allocates Additional Compute for Potentially Harmful Prompts:** Utilizes a budget allocator to assess the risk profile of each prompt and assigns appropriate computational resources for safety evaluation.​
+
+- **Employs Group Relative Policy Optimization (GRPO) for Training:** Leverages GRPO, a reinforcement learning technique that normalizes rewards within a group of generated outputs, eliminating the need for a separate "critic" model and reducing computational cost. ​
+en.wikipedia.org
+
+- **Minimizes Computational Overhead for Safe Interactions:** Ensures that additional safety computations are performed only when necessary, maintaining efficiency.​
+
+- **Enables Scalable Deployment of Safety Mechanisms:** Facilitates the integration of advanced safety features into existing LLM deployments without significant infrastructure changes.​
+
+Current Status: The main LLM, equipped with integrated safety reasoning capabilities, has been developed and is operational. Development of the budget allocator component, responsible for dynamic compute allocation based on prompt risk assessment, is ongoing.
+
 
 ## Installation
 
@@ -79,7 +85,7 @@ Model configurations (in config_full.yaml): Defines model architecture, training
 
 ### Hardware Requirements
 - Recommended: 8× H100 GPUs (80GB)
-- Minimum: 4× A100 GPUs
+- Minimum (Current Setup): 4× A100 GPUs 
 - For different hardware configurations, adjust batch size and gradient accumulation steps in the config files accordingly.
 
 ### Project Structure
