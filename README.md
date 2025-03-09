@@ -107,7 +107,7 @@ Model configurations (in config_full.yaml): Defines model architecture, training
 
 ## Acknowledgments
 
-This project significantly builds upon the work of the [open-r1](https://github.com/OpenR1/open-r1) project. We are grateful to the open-r1 team for their excellent foundation, particularly:
+This project significantly builds upon the work of the [open-r1](https://github.com/huggingface/open-r1) project. We are grateful to the open-r1 team for their excellent foundation, particularly:
 
 - GRPO (Group Relative Policy Optimization) implementation
 - Training recipes and configurations
