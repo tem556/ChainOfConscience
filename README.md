@@ -2,7 +2,7 @@
 
 An adaptive safety system that intelligently allocates test-time compute for enhanced LLM alignment through dynamic safety reasoning.
 
-> **Note**: This project builds upon the [open-r1](https://github.com/OpenR1/open-r1) project. The GRPO implementation and training recipes are derived from open-r1 and modified to suit our safety-focused requirements.
+> **Note**: This project builds upon the [open-r1](https://github.com/huggingface/open-r1) project. The GRPO implementation and training recipes are derived from open-r1 and modified to suit our safety-focused requirements.
 
 ## Overview
 
