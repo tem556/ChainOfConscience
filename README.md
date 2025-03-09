@@ -12,9 +12,6 @@ This project introduces a *dynamic safety framework* for Large Language Models (
 
 - **Dynamically Allocates Additional Compute for Potentially Harmful Prompts:** Utilizes a budget allocator to assess the risk profile of each prompt and assigns appropriate computational resources for safety evaluation.​
 
-- **Employs Group Relative Policy Optimization (GRPO) for Training:** Leverages GRPO, a reinforcement learning technique that normalizes rewards within a group of generated outputs, eliminating the need for a separate "critic" model and reducing computational cost. ​
-en.wikipedia.org
-
 - **Minimizes Computational Overhead for Safe Interactions:** Ensures that additional safety computations are performed only when necessary, maintaining efficiency.​
 
 - **Enables Scalable Deployment of Safety Mechanisms:** Facilitates the integration of advanced safety features into existing LLM deployments without significant infrastructure changes.​
